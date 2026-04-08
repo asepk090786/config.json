@@ -1,0 +1,185 @@
+{
+  "version": "1.0.1-lite",
+  "base_url": "https://your-domain.example/",
+  "exambro_page_url": "https://your-domain.example/exambro",
+  "school_name": "Nama Sekolah",
+  "app_name": "CBT Garuda",
+  "warning_audio_enabled": false,
+  "exam_rotation_mode": "auto",
+
+  "status_checks": {
+    "server_status": {
+      "enabled": false,
+      "label": "Status Server",
+      "description": "Verifikasi server exam dapat diakses",
+      "check_interval_seconds": 600,
+      "timeout_seconds": 5,
+      "retry_count": 1,
+      "check_method": "connectivity",
+      "fallback_on_error": "use_cached_status",
+      "ui_indicator": {
+        "show_lamp": true,
+        "show_label": true,
+        "label_loading": "Memeriksa server...",
+        "label_ok": "Server siap",
+        "label_error": "Server tidak siap"
+      }
+    },
+
+    "status_pin": {
+      "enabled": false,
+      "label": "Status PIN/Token",
+      "description": "PIN keamanan untuk exam access",
+      "fetch_from_api": false,
+      "api_endpoint": "status_token",
+      "check_interval_seconds": 600,
+      "timeout_seconds": 5,
+      "retry_count": 1,
+      "on_enable": {
+        "action": "show_notification",
+        "message": "PIN keamanan AKTIF - Perlu PIN untuk akses exam"
+      },
+      "on_disable": {
+        "action": "show_notification",
+        "message": "PIN keamanan tidak aktif"
+      },
+      "ui_indicator": {
+        "show_lamp": true,
+        "show_label": true,
+        "show_value": true,
+        "label_loading": "Memeriksa PIN...",
+        "label_ok": "PIN Aktif",
+        "label_error": "PIN tidak tersedia"
+      }
+    },
+
+    "status_peringatan": {
+      "enabled": false,
+      "label": "Status Peringatan",
+      "description": "Warning/notifikasi untuk peserta ujian",
+      "fetch_from_api": false,
+      "api_endpoint": "status_warning",
+      "check_interval_seconds": 600,
+      "timeout_seconds": 5,
+      "retry_count": 1,
+      "audio_alert_enabled": false,
+      "on_warning": {
+        "action": "play_audio_and_notify",
+        "audio_file": "warning",
+        "notification": "Ada peringatan dari server - Perhatikan pesan di layar",
+        "show_on_screen": true
+      },
+      "on_clear": {
+        "action": "clear_notification",
+        "message": "Peringatan telah dihapus"
+      },
+      "ui_indicator": {
+        "show_lamp": true,
+        "show_label": true,
+        "show_value": true,
+        "label_loading": "Memeriksa peringatan...",
+        "label_ok": "Tidak ada peringatan",
+        "label_warning": "Peringatan Aktif",
+        "lamp_color_ok": "#00AA00",
+        "lamp_color_warning": "#FF6600"
+      }
+    }
+  },
+
+  "status_behavior": {
+    "on_startup": {
+      "check_immediately": false,
+      "show_loading_indicator": false,
+      "timeout_before_fallback_seconds": 3
+    },
+    "on_connect_error": {
+      "action": "use_cached_status",
+      "show_error_indicator": false,
+      "retry_automatically": false,
+      "retry_interval_seconds": 30
+    },
+    "on_parse_error": {
+      "action": "log_error_and_retry",
+      "show_error_to_user": false,
+      "retry_immediately": false
+    },
+    "polling_strategy": {
+      "server_status": {
+        "interval_seconds": 600,
+        "method": "connectivity_check",
+        "required_for_exam": false
+      },
+      "status_pin": {
+        "interval_seconds": 600,
+        "method": "api_fetch",
+        "required_for_exam": false,
+        "critical": false
+      },
+      "status_peringatan": {
+        "interval_seconds": 600,
+        "method": "api_fetch",
+        "required_for_exam": false,
+        "critical": false
+      }
+    }
+  },
+
+  "cache_policy": {
+    "status_cache_duration_seconds": 1800,
+    "cache_on_error": true,
+    "cache_fallback_ttl_seconds": 7200,
+    "cache_storage": "shared_preferences"
+  },
+
+  "network_config": {
+    "connect_timeout_seconds": 5,
+    "read_timeout_seconds": 5,
+    "retry_count": {
+      "server_status": 1,
+      "status_pin": 1,
+      "status_peringatan": 1
+    },
+    "retry_interval_seconds": 5,
+    "backoff_multiplier": 2.0,
+    "allow_unencrypted": false,
+    "verify_ssl_certificates": true
+  },
+
+  "ui_config": {
+    "status_display": {
+      "show_server_status": true,
+      "show_pin_status": true,
+      "show_warning_status": true
+    },
+    "indicator_style": {
+      "type": "lamp",
+      "size": "medium",
+      "animation_on_change": false
+    },
+    "status_labels": {
+      "loading": {
+        "color": "#FFCC00",
+        "icon": "spinner"
+      },
+      "ok": {
+        "color": "#00AA00",
+        "icon": "check"
+      },
+      "error": {
+        "color": "#FF0000",
+        "icon": "alert"
+      },
+      "warning": {
+        "color": "#FF6600",
+        "icon": "warning"
+      }
+    },
+    "refresh_display_interval_seconds": 2
+  },
+
+  "data": {
+    "support_email": "",
+    "support_phone": ""
+  }
+}
+
