@@ -1,0 +1,7 @@
+# Ignore runtime and temporary files
+server.log
+server.pid
+sync.log
+request.log
+node_modules/
+*.tar.gz
