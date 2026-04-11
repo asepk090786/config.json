@@ -1,0 +1,14 @@
+{
+  "port": 3000,
+  "db": {
+    "host": "16.78.150.150",
+    "port": 3306,
+    "database": "garudacbt",
+    "user": "papah",
+    "password": "adminkece"
+  },
+  "baseUrl": "https://token.belajar2026.net",
+  "syncMinSeconds": 5,
+  "syncMaxSeconds": 10,
+  "logFile": "sync.log"
+}

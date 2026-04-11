@@ -1,0 +1,121 @@
+[2026-04-11T02:14:10.882Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:15:11.020Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:16:40.071Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:18:07.121Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:19:22.154Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:20:35.204Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:21:51.239Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:22:54.267Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:24:08.314Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:25:10.402Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:26:18.435Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:27:38.475Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:29:07.526Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:30:14.564Z] sync ok token=ARUEPF pin=910350 version=20260411020002000
+[2026-04-11T02:30:28.763Z] starting sync from cbt_json_history
+[2026-04-11T02:30:28.781Z] JSON server running on port 3000
+[2026-04-11T02:30:28.918Z] updated local files config.json and version.json to version 20260410164312935
+[2026-04-11T02:30:28.918Z] sync ok version=20260410164312935
+[2026-04-11T02:30:28.919Z] Next MySQL sync in 70 seconds (at 2026-04-11T02:31:38.918Z)
+[2026-04-11T02:31:38.929Z] starting sync from cbt_json_history
+[2026-04-11T02:31:38.970Z] no update needed, local version 20260410164312935 matches cbt_json_history
+[2026-04-11T02:31:38.970Z] sync ok version=20260410164312935
+[2026-04-11T02:31:38.971Z] Next MySQL sync in 88 seconds (at 2026-04-11T02:33:06.971Z)
+[2026-04-11T02:33:06.981Z] starting sync from cbt_json_history
+[2026-04-11T02:33:07.023Z] no update needed, local version 20260410164312935 matches cbt_json_history
+[2026-04-11T02:33:07.031Z] sync ok version=20260410164312935
+[2026-04-11T02:33:07.032Z] Next MySQL sync in 86 seconds (at 2026-04-11T02:34:33.032Z)
+[2026-04-11T02:34:33.036Z] starting sync from cbt_json_history
+[2026-04-11T02:34:33.080Z] no update needed, local version 20260410164312935 matches cbt_json_history
+[2026-04-11T02:34:33.081Z] sync ok version=20260410164312935
+[2026-04-11T02:34:33.081Z] Next MySQL sync in 84 seconds (at 2026-04-11T02:35:57.081Z)
+[2026-04-11T02:35:57.084Z] starting sync from cbt_json_history
+[2026-04-11T02:35:57.126Z] no update needed, local version 20260410164312935 matches cbt_json_history
+[2026-04-11T02:35:57.127Z] sync ok version=20260410164312935
+[2026-04-11T02:35:57.127Z] Next MySQL sync in 63 seconds (at 2026-04-11T02:37:00.127Z)
+[2026-04-11T02:37:00.129Z] starting sync from cbt_json_history
+[2026-04-11T02:37:00.174Z] sync ok version=20260410164312293
+[2026-04-11T02:37:00.173Z] updated local files config.json and version.json to version 20260410164312293
+[2026-04-11T02:37:00.174Z] Next MySQL sync in 87 seconds (at 2026-04-11T02:38:27.174Z)
+[2026-04-11T02:38:27.179Z] starting sync from cbt_json_history
+[2026-04-11T02:38:27.223Z] updated local files config.json and version.json to version 20260410164312261
+[2026-04-11T02:38:27.223Z] sync ok version=20260410164312261
+[2026-04-11T02:38:27.224Z] Next MySQL sync in 89 seconds (at 2026-04-11T02:39:56.223Z)
+[2026-04-11T02:39:56.242Z] starting sync from cbt_json_history
+[2026-04-11T02:39:56.283Z] no update needed, local version 20260410164312261 matches cbt_json_history
+[2026-04-11T02:39:56.283Z] sync ok version=20260410164312261
+[2026-04-11T02:39:56.283Z] Next MySQL sync in 72 seconds (at 2026-04-11T02:41:08.283Z)
+[2026-04-11T02:41:08.288Z] starting sync from cbt_json_history
+[2026-04-11T02:41:08.327Z] no update needed, local version 20260410164312261 matches cbt_json_history
+[2026-04-11T02:41:08.327Z] sync ok version=20260410164312261
+[2026-04-11T02:41:08.328Z] Next MySQL sync in 67 seconds (at 2026-04-11T02:42:15.328Z)
+[2026-04-11T02:42:15.335Z] starting sync from cbt_json_history
+[2026-04-11T02:42:15.377Z] no update needed, local version 20260410164312261 matches cbt_json_history
+[2026-04-11T02:42:15.378Z] sync ok version=20260410164312261
+[2026-04-11T02:42:15.378Z] Next MySQL sync in 85 seconds (at 2026-04-11T02:43:40.378Z)
+[2026-04-11T02:43:40.403Z] starting sync from cbt_json_history
+[2026-04-11T02:43:40.446Z] no update needed, local version 20260410164312261 matches cbt_json_history
+[2026-04-11T02:43:40.446Z] sync ok version=20260410164312261
+[2026-04-11T02:43:40.446Z] Next MySQL sync in 76 seconds (at 2026-04-11T02:44:56.446Z)
+[2026-04-11T02:44:56.473Z] starting sync from cbt_json_history
+[2026-04-11T02:44:56.516Z] updated local files config.json and version.json to version 20260410164312685
+[2026-04-11T02:44:56.516Z] sync ok version=20260410164312685
+[2026-04-11T02:44:56.517Z] Next MySQL sync in 76 seconds (at 2026-04-11T02:46:12.516Z)
+[2026-04-11T02:46:12.530Z] starting sync from cbt_json_history
+[2026-04-11T02:46:12.570Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:46:12.570Z] sync ok version=20260410164312685
+[2026-04-11T02:46:12.571Z] Next MySQL sync in 70 seconds (at 2026-04-11T02:47:22.571Z)
+[2026-04-11T02:46:42.951Z] starting sync from cbt_json_history
+[2026-04-11T02:46:42.968Z] JSON server running on port 3000
+[2026-04-11T02:46:43.098Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:46:43.098Z] sync ok version=20260410164312685
+[2026-04-11T02:46:43.099Z] Next MySQL sync in 85 seconds (at 2026-04-11T02:48:08.099Z)
+[2026-04-11T02:48:08.124Z] starting sync from cbt_json_history
+[2026-04-11T02:48:08.163Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:48:08.163Z] sync ok version=20260410164312685
+[2026-04-11T02:48:08.164Z] Next MySQL sync in 70 seconds (at 2026-04-11T02:49:18.164Z)
+[2026-04-11T02:49:18.169Z] starting sync from cbt_json_history
+[2026-04-11T02:49:18.213Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:49:18.214Z] sync ok version=20260410164312685
+[2026-04-11T02:49:18.216Z] Next MySQL sync in 64 seconds (at 2026-04-11T02:50:22.216Z)
+[2026-04-11T02:50:22.227Z] starting sync from cbt_json_history
+[2026-04-11T02:50:22.277Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:50:22.278Z] sync ok version=20260410164312685
+[2026-04-11T02:50:22.279Z] Next MySQL sync in 60 seconds (at 2026-04-11T02:51:22.279Z)
+[2026-04-11T02:51:22.288Z] starting sync from cbt_json_history
+[2026-04-11T02:51:22.330Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:51:22.331Z] sync ok version=20260410164312685
+[2026-04-11T02:51:22.331Z] Next MySQL sync in 62 seconds (at 2026-04-11T02:52:24.331Z)
+[2026-04-11T02:51:31.306Z] starting sync from cbt_json_history
+[2026-04-11T02:51:31.328Z] JSON server running on port 3000
+[2026-04-11T02:51:31.453Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:51:31.454Z] sync ok version=20260410164312685
+[2026-04-11T02:51:31.455Z] Next MySQL sync in 81 seconds (at 2026-04-11T02:52:52.454Z)
+[2026-04-11T02:52:52.465Z] starting sync from cbt_json_history
+[2026-04-11T02:52:52.503Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:52:52.503Z] sync ok version=20260410164312685
+[2026-04-11T02:52:52.504Z] Next MySQL sync in 69 seconds (at 2026-04-11T02:54:01.503Z)
+[2026-04-11T02:54:01.505Z] starting sync from cbt_json_history
+[2026-04-11T02:54:01.546Z] no update needed, local version 20260410164312685 matches cbt_json_history
+[2026-04-11T02:54:01.547Z] sync ok version=20260410164312685
+[2026-04-11T02:54:01.547Z] Next MySQL sync in 77 seconds (at 2026-04-11T02:55:18.547Z)
+[2026-04-11T02:55:18.564Z] starting sync from cbt_json_history
+[2026-04-11T02:55:18.615Z] sync ok version=20260411095458992
+[2026-04-11T02:55:18.616Z] Next MySQL sync in 64 seconds (at 2026-04-11T02:56:22.616Z)
+[2026-04-11T02:55:18.615Z] updated local files config.json and version.json to version 20260411095458992
+[2026-04-11T02:56:22.634Z] starting sync from cbt_json_history
+[2026-04-11T02:56:22.679Z] updated local files config.json and version.json to version 20260411095458324
+[2026-04-11T02:56:22.680Z] sync ok version=20260411095458324
+[2026-04-11T02:56:22.681Z] Next MySQL sync in 64 seconds (at 2026-04-11T02:57:26.681Z)
+[2026-04-11T02:57:26.696Z] starting sync from cbt_json_history
+[2026-04-11T02:57:26.757Z] no update needed, local version 20260411095458324 matches cbt_json_history
+[2026-04-11T02:57:26.758Z] sync ok version=20260411095458324
+[2026-04-11T02:57:26.758Z] Next MySQL sync in 82 seconds (at 2026-04-11T02:58:48.758Z)
+[2026-04-11T02:58:48.776Z] starting sync from cbt_json_history
+[2026-04-11T02:58:48.813Z] no update needed, local version 20260411095458324 matches cbt_json_history
+[2026-04-11T02:58:48.813Z] sync ok version=20260411095458324
+[2026-04-11T02:58:48.815Z] Next MySQL sync in 76 seconds (at 2026-04-11T03:00:04.814Z)
+[2026-04-11T03:00:04.815Z] starting sync from cbt_json_history
+[2026-04-11T03:00:04.856Z] updated local files config.json and version.json to version 20260411095458323
+[2026-04-11T03:00:04.857Z] sync ok version=20260411095458323
+[2026-04-11T03:00:04.857Z] Next MySQL sync in 73 seconds (at 2026-04-11T03:01:17.857Z)
