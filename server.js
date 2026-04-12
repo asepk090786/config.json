@@ -66,7 +66,7 @@ async function reloadDbPool(settings) {
 app.use((req, res, next) => {
   const startTime = Date.now();
   const pathName = req.path;
-  const trackPaths = ['/config.json', '/version.json', '/monitor', '/health'];
+  const trackPaths = ['/config.json', '/version.json', '/api/config.json', '/api/version.json', '/monitor', '/health'];
   const isApiEndpoint =
     trackPaths.includes(pathName) ||
     pathName.startsWith('/exambro/');
@@ -153,6 +153,19 @@ function readLastRequestLogLines(limit = 50) {
   }
 }
 
+function getRecentConfigVersionRequests(limit = 50) {
+  return requestStats.lastRequests
+    .filter((r) => [
+      '/config.json',
+      '/version.json',
+      '/api/config.json',
+      '/api/version.json',
+      '/exambro/config.json',
+      '/exambro/version.json',
+    ].includes(r.path))
+    .slice(0, limit);
+}
+
 function formatConfigVersion(date, ms = 0) {
   const pad = (value, length) => String(value).padStart(length, '0');
   return [
@@ -211,6 +224,16 @@ async function requireApiKey(req, res) {
   const provided = getRequestApiKey(req);
   if (!provided || provided !== expected) {
     res.status(401).json({ error: 'Invalid or missing apikey' });
+    return false;
+  }
+  return true;
+}
+
+async function requireApiKey404(req, res) {
+  const expected = await loadLatestConfigApiKey();
+  const provided = getRequestApiKey(req);
+  if (!provided || !expected || provided !== expected) {
+    res.sendStatus(404);
     return false;
   }
   return true;
@@ -333,6 +356,18 @@ app.get('/config.json', async (req, res) => sendHistoryJson(req, res, 'config.js
 app.get('/version.json', async (req, res) => sendHistoryJson(req, res, 'version.json'));
 app.get('/exambro/config.json', async (req, res) => sendHistoryJson(req, res, 'config.json'));
 app.get('/exambro/version.json', async (req, res) => sendHistoryJson(req, res, 'version.json'));
+app.get('/api/config.json', async (req, res) => {
+  if (!(await requireApiKey404(req, res))) {
+    return;
+  }
+  await sendHistoryJson(req, res, 'config.json');
+});
+app.get('/api/version.json', async (req, res) => {
+  if (!(await requireApiKey404(req, res))) {
+    return;
+  }
+  await sendHistoryJson(req, res, 'version.json');
+});
 
 function renderDbSettingsPage() {
   const dbConfig = getDbConfig(appSettings);
@@ -458,6 +493,13 @@ app.post('/api/admin/db-settings', saveDbSettingsHandler);
 
 app.get('/monitor', async (req, res) => {
   const requestLogLines = readLastRequestLogLines(50);
+  const filteredRequestLogLines = requestLogLines.filter((line) =>
+    line.includes('/config.json') ||
+    line.includes('/version.json') ||
+    line.includes('/api/config.json') ||
+    line.includes('/api/version.json')
+  );
+  const recentConfigVersionRequests = getRecentConfigVersionRequests(50);
   const html = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -492,6 +534,14 @@ app.get('/monitor', async (req, res) => {
       .join('')}
   </table>
 
+  <h2>Version/Config request counts</h2>
+  <table>
+    <tr><th>Endpoint</th><th>Count</th></tr>
+    ${['/config.json', '/version.json', '/exambro/config.json', '/exambro/version.json']
+      .map((path) => `<tr><td>${path}</td><td>${requestStats.byEndpoint[path] || 0}</td></tr>`)
+      .join('')}
+  </table>
+
   <h2>Response status codes</h2>
   <table>
     <tr><th>Status</th><th>Count</th></tr>
@@ -500,16 +550,18 @@ app.get('/monitor', async (req, res) => {
       .join('')}
   </table>
 
-  <h2>Recent API requests</h2>
+  <h2>Recent version/config requests</h2>
   <table>
     <tr><th>Time</th><th>Path</th><th>Method</th><th>Status</th><th>Duration (ms)</th></tr>
-    ${requestStats.lastRequests.slice(0, 50)
-      .map(r => `<tr><td>${r.time}</td><td>${r.path}</td><td>${r.method}</td><td>${r.status}</td><td>${r.durationMs}</td></tr>`)
-      .join('')}
+    ${recentConfigVersionRequests.length > 0
+      ? recentConfigVersionRequests
+          .map((r) => `<tr><td>${r.time}</td><td>${r.path}</td><td>${r.method}</td><td>${r.status}</td><td>${r.durationMs}</td></tr>`)
+          .join('')
+      : '<tr><td colspan="5">No version/config requests yet.</td></tr>'}
   </table>
 
-  <h2>Request log</h2>
-  <pre>${requestLogLines.length > 0 ? requestLogLines.join('\n') : 'No request log entries yet.'}</pre>
+  <h2>Filtered request log (config/version only)</h2>
+  <pre>${filteredRequestLogLines.length > 0 ? filteredRequestLogLines.join('\n') : 'No version/config request log entries yet.'}</pre>
 </body>
 </html>`;
   res.type('text/html').send(html);

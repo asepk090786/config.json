@@ -1,10 +1,10 @@
 {
-    "config_version": "20260411095458138",
-    "config_url": "https://api.belajar2026.net/api/exambro/config.json",
-    "config_url_versioned": "https://api.belajar2026.net/api/exambro/config.json?v=20260411095458138",
-    "last_updated": "2026-04-11T09:54:58+07:00",
-    "timestamp": 1775879199139,
+    "config_version": "20260412162420062",
+    "config_url": "https://api.belajar2026.net/config.json",
+    "config_url_versioned": "https://api.belajar2026.net/config.json?v=20260412162420062",
+    "last_updated": "2026-04-12T16:24:20+07:00",
+    "timestamp": 1775985884063,
     "min_app_version": "1.0.0",
     "message": "Configuration loaded successfully",
-    "config_hash": "05e62672d12ab9f3c2f2ced4672fc2ad397c79aea85debf62c9a49744adbd4a4"
+    "config_hash": "b1e9354678b0ca2f003af2f80b624b6494a2a7057feae87459cdd539291e932e"
 }
