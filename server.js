@@ -7,6 +7,8 @@ const mysql = require('mysql2/promise');
 const crypto = require('crypto');
 
 const app = express();
+app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 const PORT = process.env.PORT || 3000;
 
 function loadAppSettings() {
@@ -22,7 +24,44 @@ function loadAppSettings() {
   }
 }
 
-const appSettings = loadAppSettings();
+let appSettings = loadAppSettings();
+
+function getDbConfig(settings) {
+  const dbConfig = settings.db || {};
+  return {
+    host: process.env.DB_HOST || dbConfig.host || '16.78.150.150',
+    port: Number(process.env.DB_PORT || dbConfig.port || 3306),
+    database: process.env.DB_DATABASE || dbConfig.database || 'garudacbt',
+    user: process.env.DB_USERNAME || process.env.DB_USER || dbConfig.user || 'papah',
+    password: process.env.DB_PASSWORD || process.env.DB_PASS || dbConfig.password || 'adminkece',
+  };
+}
+
+function createDbPool(settings) {
+  const dbConfig = getDbConfig(settings);
+  return mysql.createPool({
+    host: dbConfig.host,
+    port: dbConfig.port,
+    database: dbConfig.database,
+    user: dbConfig.user,
+    password: dbConfig.password,
+    waitForConnections: true,
+    connectionLimit: 5,
+    queueLimit: 0,
+  });
+}
+
+let pool = createDbPool(appSettings);
+
+async function reloadDbPool(settings) {
+  const oldPool = pool;
+  pool = createDbPool(settings);
+  try {
+    await oldPool.end();
+  } catch (err) {
+    console.error('Error closing old DB pool:', err.message || err);
+  }
+}
 
 app.use((req, res, next) => {
   const startTime = Date.now();
@@ -58,11 +97,6 @@ app.use((req, res, next) => {
 
   next();
 });
-const DB_HOST = process.env.DB_HOST || appSettings.db?.host || '16.78.150.150';
-const DB_PORT = process.env.DB_PORT || appSettings.db?.port || 3306;
-const DB_DATABASE = process.env.DB_DATABASE || appSettings.db?.database || 'garudacbt';
-const DB_USER = process.env.DB_USERNAME || process.env.DB_USER || appSettings.db?.user || 'papah';
-const DB_PASSWORD = process.env.DB_PASSWORD || process.env.DB_PASS || appSettings.db?.password || 'adminkece';
 
 const SYNC_MIN_SECONDS = Number(process.env.SYNC_MIN_SECONDS || appSettings.syncMinSeconds || 5);
 const SYNC_MAX_SECONDS = Number(process.env.SYNC_MAX_SECONDS || appSettings.syncMaxSeconds || 10);
@@ -72,17 +106,6 @@ const DESCRIPTION = process.env.SCHOOL_DESCRIPTION || 'Konfigurasi CBT SMA NEGER
 const BASE_URL = process.env.BASE_URL || appSettings.baseUrl || 'https://token.belajar2026.net';
 const LOG_FILE = process.env.LOG_FILE || appSettings.logFile || 'sync.log';
 const REQUEST_LOG_FILE = process.env.REQUEST_LOG_FILE || 'request.log';
-
-const pool = mysql.createPool({
-  host: DB_HOST,
-  port: DB_PORT,
-  database: DB_DATABASE,
-  user: DB_USER,
-  password: DB_PASSWORD,
-  waitForConnections: true,
-  connectionLimit: 5,
-  queueLimit: 0,
-});
 
 let lastSync = null;
 let nextSync = null;
@@ -310,6 +333,128 @@ app.get('/config.json', async (req, res) => sendHistoryJson(req, res, 'config.js
 app.get('/version.json', async (req, res) => sendHistoryJson(req, res, 'version.json'));
 app.get('/exambro/config.json', async (req, res) => sendHistoryJson(req, res, 'config.json'));
 app.get('/exambro/version.json', async (req, res) => sendHistoryJson(req, res, 'version.json'));
+
+function renderDbSettingsPage() {
+  const dbConfig = getDbConfig(appSettings);
+  return `<!DOCTYPE html>
+<html lang="id">
+<head>
+` +
+  `  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin DB Settings</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; background: #f7f8fb; color: #111; }
+    .container { max-width: 700px; margin: auto; background: #fff; padding: 24px; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); }
+    label { display: block; margin-top: 16px; font-weight: 600; }
+    input { width: 100%; padding: 10px; margin-top: 6px; border: 1px solid #ccc; border-radius: 6px; }
+    button { margin-top: 20px; padding: 12px 18px; background: #0054d2; color: white; border: none; border-radius: 8px; cursor: pointer; }
+    button:hover { background: #003faa; }
+    .note { margin: 10px 0 0; color: #555; font-size: 0.95rem; }
+    .status { margin-top: 16px; padding: 12px; border-radius: 8px; display: none; }
+    .status.success { background: #e6ffed; color: #0f5f28; border: 1px solid #8fe19a; }
+    .status.error { background: #ffe8e8; color: #8f1b1b; border: 1px solid #f1a2a2; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Admin Database Settings</h1>
+    <p>Atur koneksi DB yang digunakan server untuk mengambil data JSON.</p>
+    <p class="note">Jika variabel lingkungan DB_HOST / DB_USER / DB_PASSWORD aktif, nilai pada file <code>app-settings.json</code> akan tertimpa.</p>
+    <form id="settingsForm">
+      <label>Host DB</label>
+      <input type="text" id="host" value="${dbConfig.host}" required />
+      <label>Port DB</label>
+      <input type="number" id="port" value="${dbConfig.port}" required />
+      <label>Database</label>
+      <input type="text" id="database" value="${dbConfig.database}" required />
+      <label>Username DB</label>
+      <input type="text" id="user" value="${dbConfig.user}" required />
+      <label>Password DB</label>
+      <input type="password" id="password" value="${dbConfig.password}" required />
+      <button type="submit">Simpan Konfigurasi</button>
+      <div class="status" id="status"></div>
+    </form>
+    <div class="note">
+      <strong>Catatan:</strong>
+      <ul>
+        <li>Jika menampilkan <strong>OVERWRITE</strong>, berarti pengaturan lingkungan aktif dan akan menimpa setting file.</li>
+      </ul>
+    </div>
+  </div>
+  <script>
+    window.addEventListener('DOMContentLoaded', () => {
+      const form = document.getElementById('settingsForm');
+      const status = document.getElementById('status');
+      form.addEventListener('submit', async (event) => {
+        event.preventDefault();
+        status.style.display = 'none';
+        const payload = {
+          host: document.getElementById('host').value.trim(),
+          port: Number(document.getElementById('port').value),
+          database: document.getElementById('database').value.trim(),
+          user: document.getElementById('user').value.trim(),
+          password: document.getElementById('password').value,
+        };
+        try {
+          const response = await fetch(window.location.pathname, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(payload),
+          });
+          const result = await response.json();
+          status.className = 'status ' + (response.ok ? 'success' : 'error');
+          status.textContent = response.ok ? result.message : result.error || 'Gagal menyimpan';
+          status.style.display = 'block';
+        } catch (err) {
+          status.className = 'status error';
+          status.textContent = err.message || 'Gagal menyimpan pengaturan';
+          status.style.display = 'block';
+        }
+      });
+    });
+  </script>
+</body>
+</html>`;
+}
+
+app.get('/admin/db-settings', (req, res) => {
+  res.type('text/html').send(renderDbSettingsPage());
+});
+app.get('/api/admin/db-settings', (req, res) => {
+  res.type('text/html').send(renderDbSettingsPage());
+});
+
+const saveDbSettingsHandler = async (req, res) => {
+  const { host, port, database, user, password } = req.body;
+  if (!host || !port || !database || !user || !password) {
+    return res.status(400).json({ error: 'Semua field DB wajib diisi.' });
+  }
+
+  const newSettings = {
+    ...appSettings,
+    db: {
+      host: String(host),
+      port: Number(port) || 3306,
+      database: String(database),
+      user: String(user),
+      password: String(password),
+    },
+  };
+
+  try {
+    fs.writeFileSync(path.join(__dirname, 'app-settings.json'), JSON.stringify(newSettings, null, 2) + '\n', 'utf8');
+    appSettings = newSettings;
+    await reloadDbPool(appSettings);
+    res.json({ success: true, message: 'Pengaturan DB berhasil disimpan dan diaktifkan.' });
+  } catch (err) {
+    console.error('Failed to save admin DB settings:', err.message || err);
+    res.status(500).json({ error: 'Gagal menyimpan pengaturan DB.', details: err.message });
+  }
+};
+
+app.post('/admin/db-settings', saveDbSettingsHandler);
+app.post('/api/admin/db-settings', saveDbSettingsHandler);
 
 app.get('/monitor', async (req, res) => {
   const requestLogLines = readLastRequestLogLines(50);
