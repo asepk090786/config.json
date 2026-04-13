@@ -567,6 +567,185 @@ app.get('/monitor', async (req, res) => {
   res.type('text/html').send(html);
 });
 
+function renderApiMonitorPage() {
+  return `<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>API Monitor - AJAX Polling</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 16px; color: #222; background: #f7f9fc; }
+    h1 { font-size: 26px; margin-bottom: 8px; }
+    .card { background: white; border-radius: 10px; box-shadow: 0 2px 10px rgba(0,0,0,0.08); padding: 18px; margin-bottom: 18px; }
+    .card h2 { margin-top: 0; }
+    label { display: block; margin: 10px 0 4px; font-weight: 600; }
+    input, button { font-size: 1rem; }
+    input { width: 100%; max-width: 420px; padding: 10px; border: 1px solid #ccc; border-radius: 6px; }
+    button { padding: 10px 16px; margin-right: 8px; border: none; border-radius: 6px; cursor: pointer; background: #0066cc; color: white; }
+    button:disabled { opacity: 0.55; cursor: not-allowed; }
+    .log { background: #101828; color: #e2e8f0; padding: 14px; border-radius: 8px; font-family: Menlo, Monaco, monospace; white-space: pre-wrap; max-height: 360px; overflow-y: auto; }
+    .status { display: inline-block; margin: 0 0 12px; padding: 10px 14px; border-radius: 8px; background: #eef6ff; color: #0b3d91; }
+    .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 12px; }
+    .summary-item { background: #f4f7fb; border-radius: 8px; padding: 12px; }
+  </style>
+</head>
+<body>
+  <h1>API Monitor</h1>
+  <p class="status">Halaman ini melakukan polling AJAX ke <code>/api/config.json</code> dan <code>/api/version.json</code>.</p>
+  <div class="card">
+    <h2>Polling settings</h2>
+    <label for="apiKey">API Key (apikey query parameter)</label>
+    <input id="apiKey" type="text" placeholder="Masukkan apikey untuk /api/config.json & /api/version.json" />
+    <label for="pollInterval">Interval polling (ms)</label>
+    <input id="pollInterval" type="number" min="1000" value="5000" />
+    <div style="margin-top: 12px;">
+      <button id="startPolling">Mulai polling</button>
+      <button id="stopPolling" disabled>Berhenti polling</button>
+      <button id="refreshState">Refresh state sekarang</button>
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Polling hasil /api/config.json dan /api/version.json</h2>
+    <div id="pollLog" class="log">Menunggu polling...</div>
+  </div>
+
+  <div class="card">
+    <h2>Monitor server state</h2>
+    <div id="stateSummary" class="summary-grid"></div>
+    <h3>Log dinamis request /config.json dan /version.json</h3>
+    <div id="requestLog" class="log">Menunggu data log server...</div>
+  </div>
+
+  <script>
+    const apiKeyInput = document.getElementById('apiKey');
+    const pollIntervalInput = document.getElementById('pollInterval');
+    const startButton = document.getElementById('startPolling');
+    const stopButton = document.getElementById('stopPolling');
+    const refreshStateButton = document.getElementById('refreshState');
+    const pollLog = document.getElementById('pollLog');
+    const stateSummary = document.getElementById('stateSummary');
+    const requestLog = document.getElementById('requestLog');
+
+    let pollTimer = null;
+    let stateTimer = null;
+    const maxLogLines = 40;
+    const appendLog = (element, text) => {
+      const now = new Date().toISOString().replace('T', ' ').replace('Z', '');
+      const line = now + ' ' + text;
+      const lines = element.textContent ? element.textContent.split('\n') : [];
+      lines.unshift(line);
+      if (lines.length > maxLogLines) lines.length = maxLogLines;
+      element.textContent = lines.join('\n');
+    };
+
+    async function fetchMonitorState() {
+      try {
+        const resp = await fetch('/api/monitor/state', { cache: 'no-store' });
+        if (!resp.ok) {
+          throw new Error('Status ' + resp.status);
+        }
+        const data = await resp.json();
+        stateSummary.innerHTML =
+          '<div class="summary-item"><strong>Port</strong><div>' + data.port + '</div></div>' +
+          '<div class="summary-item"><strong>Sync status</strong><div>' + data.syncStatus + '</div></div>' +
+          '<div class="summary-item"><strong>Last sync</strong><div>' + (data.lastSync || 'n/a') + '</div></div>' +
+          '<div class="summary-item"><strong>Next sync</strong><div>' + (data.nextSync || 'n/a') + '</div></div>' +
+          '<div class="summary-item"><strong>Last sync error</strong><div>' + (data.lastSyncError || 'none') + '</div></div>' +
+          '<div class="summary-item"><strong>Total requests</strong><div>' + data.requestStats.total + '</div></div>';
+
+        const recentLines = data.filteredRequestLogLines.length > 0
+          ? data.filteredRequestLogLines.slice(-20).reverse().join('\n')
+          : 'Tidak ada entri log terbaru untuk /config.json atau /version.json.';
+        requestLog.textContent = recentLines;
+      } catch (err) {
+        requestLog.textContent = 'Gagal memuat state server: ' + err.message;
+      }
+    }
+
+    async function pollEndpoints() {
+      const apiKey = apiKeyInput.value.trim();
+      const intervalMs = Number(pollIntervalInput.value) || 5000;
+      const query = apiKey ? '?apikey=' + encodeURIComponent(apiKey) : '';
+      const targets = ['/api/config.json', '/api/version.json'];
+
+      appendLog(pollLog, 'Memulai polling ' + targets.join(' dan ') + (query ? ' dengan apikey' : ' tanpa apikey'));
+      const results = await Promise.all(targets.map(async (path) => {
+        try {
+          const response = await fetch(path + query, { cache: 'no-store' });
+          const text = await response.text();
+          const contentPreview = text.length > 200 ? text.slice(0, 200) + '...' : text;
+          const status = response.ok ? 'OK' : 'ERR ' + response.status;
+          appendLog(pollLog, path + ' -> ' + status + ' (' + response.status + ') ' + contentPreview.replace(/\n/g, ' '));
+        } catch (error) {
+          appendLog(pollLog, path + ' -> FETCH ERROR ' + error.message);
+        }
+      }));
+      if (!pollTimer) {
+        pollTimer = setInterval(async () => {
+          await pollEndpoints();
+        }, intervalMs);
+      }
+    }
+
+    function startPolling() {
+      if (pollTimer) return;
+      pollEndpoints();
+      stopButton.disabled = false;
+      startButton.disabled = true;
+    }
+
+    function stopPolling() {
+      if (!pollTimer) return;
+      clearInterval(pollTimer);
+      pollTimer = null;
+      appendLog(pollLog, 'Polling dihentikan.');
+      stopButton.disabled = true;
+      startButton.disabled = false;
+    }
+
+    startButton.addEventListener('click', () => {
+      startPolling();
+    });
+
+    stopButton.addEventListener('click', () => {
+      stopPolling();
+    });
+
+    refreshStateButton.addEventListener('click', fetchMonitorState);
+
+    window.addEventListener('load', () => {
+      fetchMonitorState();
+      stateTimer = setInterval(fetchMonitorState, 5000);
+    });
+  </script>
+</body>
+</html>`;
+}
+
+app.get('/api/monitor', (req, res) => {
+  res.type('text/html').send(renderApiMonitorPage());
+});
+
+app.get('/api/monitor/state', (req, res) => {
+  const filteredRequestLogLines = readLastRequestLogLines(50).filter((line) =>
+    line.includes('/config.json') ||
+    line.includes('/version.json') ||
+    line.includes('/api/config.json') ||
+    line.includes('/api/version.json')
+  );
+  res.json({
+    port: PORT,
+    syncStatus,
+    lastSync,
+    nextSync,
+    lastSyncError,
+    requestStats,
+    filteredRequestLogLines,
+  });
+});
+
 app.get('/health', async (req, res) => {
   try {
     const mysqlOk = await pool.query('SELECT 1');
